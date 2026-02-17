@@ -1,0 +1,16 @@
+name: Commits Syntax Checker
+
+on:
+  # Trigger the workflow on every push to any branch
+  push:
+
+jobs:
+  check:
+    name: Conventional Commits
+    runs-on: ubuntu-24.04
+
+    steps:
+      
+      # Step to validate commit messages following the Conventional Commits standard
+      - name: Validate commit messages
+        uses: webiny/action-conventional-commits@v1.3.0
