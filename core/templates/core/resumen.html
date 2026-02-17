@@ -1,0 +1,30 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+
+<h2>Resumen General</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Actividad</th>
+            <th>Inscritos</th>
+            <th>Ingresos</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for actividad in actividades %}
+        <tr>
+            <td>{{ actividad.nombre }}</td>
+            <td>{{ actividad.total_inscripciones }}</td>
+            <td>{{ actividad.ingresos_totales }} €</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h3>Total ingresos generales: {{ total_ingresos }} €</h3>
+
+<a href="{% url 'lista_actividades' %}" class="btn">Volver</a>
+
+{% endblock %}

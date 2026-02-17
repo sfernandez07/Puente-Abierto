@@ -1,0 +1,39 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+
+<h2>Historial de {{ participante }}</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>Actividad</th>
+            <th>Fecha</th>
+            <th>Pagado</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for inscripcion in inscripciones %}
+        <tr>
+            <td>{{ inscripcion.actividad.nombre }}</td>
+            <td>{{ inscripcion.actividad.fecha_inicio }}</td>
+            <td>
+                {% if inscripcion.pagado %}
+                    ✅
+                {% else %}
+                    ❌
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="3">No tiene inscripciones registradas.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<br>
+<a href="{% url 'lista_actividades' %}" class="btn">Volver</a>
+
+{% endblock %}

@@ -1,0 +1,31 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+
+<h2>Nueva Inscripción</h2>
+
+<form method="post">
+    {% csrf_token %}
+
+    {% if form.errors %}
+        <div class="alert">
+            {{ form.non_field_errors }}
+            Por favor revisa los datos.
+        </div>
+    {% endif %}
+
+    <table>
+        {{ form.as_table }}
+    </table>
+
+    <br>
+    <button type="submit" class="btn btn-success">
+        Registrar inscripción
+    </button>
+
+    <a href="{% url 'lista_actividades' %}" class="btn btn-danger">
+        Cancelar
+    </a>
+</form>
+
+{% endblock %}

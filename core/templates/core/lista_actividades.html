@@ -1,0 +1,61 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+<h2>Listado de Actividades</h2>
+
+<a href="{% url 'crear_actividad' %}" class="btn btn-success">
+    + Nueva Actividad
+</a>
+
+<br><br>
+
+<table>
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Fechas</th>
+            <th>Precio</th>
+            <th>Plazas</th>
+            <th>Disponibles</th>
+            <th>Inscritos</th>
+            <th>Ingresos</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for actividad in actividades %}
+        <tr>
+            <td>{{ actividad.nombre }}</td>
+            <td>
+                {{ actividad.fecha_inicio }} <br>
+                {{ actividad.fecha_fin }}
+            </td>
+            <td>{{ actividad.precio }} €</td>
+            <td>{{ actividad.plazas_maximas }}</td>
+            <td>
+                {% if actividad.plazas_disponibles > 0 %}
+                    {{ actividad.plazas_disponibles }}
+                {% else %}
+                    <strong style="color:red;">Completo</strong>
+                {% endif %}
+            </td>
+            <td>{{ actividad.total_inscripciones }}</td>
+            <td>{{ actividad.ingresos_totales }} €</td>
+            <td>
+                <a href="{% url 'editar_actividad' actividad.pk %}" class="btn">
+                    Editar
+                </a>
+                <a href="{% url 'participantes_actividad' actividad.pk %}" class="btn">
+                    Participantes
+                </a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="8">No hay actividades registradas.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

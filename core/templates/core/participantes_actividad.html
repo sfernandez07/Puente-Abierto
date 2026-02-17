@@ -1,0 +1,57 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+
+<h2>Participantes - {{ actividad.nombre }}</h2>
+
+<p>
+    <strong>Plazas disponibles:</strong> {{ actividad.plazas_disponibles }} <br>
+    <strong>Ingresos totales:</strong> {{ actividad.ingresos_totales }} €
+</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Teléfono</th>
+            <th>Fecha inscripción</th>
+            <th>Pagado</th>
+            <th>Historial</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for inscripcion in inscripciones %}
+        <tr>
+            <td>{{ inscripcion.participante }}</td>
+            <td>{{ inscripcion.participante.email }}</td>
+            <td>{{ inscripcion.participante.telefono }}</td>
+            <td>{{ inscripcion.fecha_inscripcion }}</td>
+            <td>
+                {% if inscripcion.pagado %} 
+                    ✅
+                {% else %}
+                    ❌
+                    <a href="{% url 'marcar_pago' inscripcion.pk %}" class="btn btn-success">
+                        Marcar como pagado
+                    </a>
+                {% endif %}
+            </td>
+            <td>
+                <a href="{% url 'historial_participante' inscripcion.participante.pk %}" class="btn">
+                    Ver historial
+                </a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="6">No hay participantes inscritos.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<br>
+<a href="{% url 'lista_actividades' %}" class="btn">Volver</a>
+
+{% endblock %}
