@@ -60,17 +60,12 @@ Solo el equipo administrativo tendrá acceso.
 ---
 
 ## Despliegue
-Opciones recomendadas:
-
-- **Render**
-- **Railway**
-- **Servidor VPS básico**
 - **PythonAnywhere**
 
 Criterios:
 - Bajo costo
 - Configuración simple
-- Soporte para PostgreSQL
+- Soporte para SQLite
 
 ---
 
@@ -100,7 +95,7 @@ Permite:
 |------|------------|
 | Lenguaje | Python 3.12 |
 | Framework | Django 5 |
-| Base de Datos | PostgreSQL |
+| Base de Datos | SQLite |
 | ORM | Django ORM |
 | Frontend | Django Templates + Bootstrap |
 | Autenticación | Sistema integrado Django |
