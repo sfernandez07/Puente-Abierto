@@ -4,6 +4,14 @@
 
 <h2>Nueva Inscripción</h2>
 
+{% if actividad %}
+    <div style="margin-bottom:15px; padding:10px; background-color:#ecf0f1;">
+        <strong>Actividad:</strong> {{ actividad.nombre }} <br>
+        <strong>Fechas:</strong> {{ actividad.fecha_inicio }} - {{ actividad.fecha_fin }} <br>
+        <strong>Plazas disponibles:</strong> {{ actividad.plazas_disponibles }}
+    </div>
+{% endif %}
+
 <form method="post">
     {% csrf_token %}
 
@@ -19,13 +27,20 @@
     </table>
 
     <br>
+
     <button type="submit" class="btn btn-success">
         Registrar inscripción
     </button>
 
-    <a href="{% url 'lista_actividades' %}" class="btn btn-danger">
-        Cancelar
-    </a>
+    {% if actividad %}
+        <a href="{% url 'participantes_actividad' actividad.pk %}" class="btn btn-danger">
+            Cancelar
+        </a>
+    {% else %}
+        <a href="{% url 'lista_actividades' %}" class="btn btn-danger">
+            Cancelar
+        </a>
+    {% endif %}
 </form>
 
 {% endblock %}

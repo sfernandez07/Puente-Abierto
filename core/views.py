@@ -3,7 +3,8 @@ from django.contrib.auth.decorators import login_required
 from .models import Actividad, Participante, Inscripcion
 from .forms import ActividadForm, InscripcionForm, ParticipanteForm
 from django.db.models import Sum
-
+import csv
+from django.http import HttpResponse
 
 
 @login_required
@@ -112,5 +113,58 @@ def eliminar_actividad(request, pk):
         return redirect("lista_actividades")
 
     return render(request, "core/confirmar_eliminacion.html", {
+        "actividad": actividad
+    })
+
+@login_required
+def exportar_participantes(request, pk):
+    actividad = get_object_or_404(Actividad, pk=pk)
+    inscripciones = actividad.inscripciones.select_related("participante")
+
+    # Crear respuesta HTTP tipo archivo
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = f'attachment; filename="participantes_{actividad.pk}.csv"'
+
+    writer = csv.writer(response)
+
+    # Cabecera
+    writer.writerow([
+        "Nombre",
+        "Apellidos",
+        "Email",
+        "Teléfono",
+        "Fecha inscripción",
+        "Pagado"
+    ])
+
+    # Datos
+    for inscripcion in inscripciones:
+        writer.writerow([
+            inscripcion.participante.nombre,
+            inscripcion.participante.apellidos,
+            inscripcion.participante.email,
+            inscripcion.participante.telefono,
+            inscripcion.fecha_inscripcion,
+            "Sí" if inscripcion.pagado else "No"
+        ])
+
+    return response
+
+@login_required
+def crear_inscripcion_actividad(request, pk):
+    actividad = get_object_or_404(Actividad, pk=pk)
+
+    if request.method == "POST":
+        form = InscripcionForm(request.POST)
+        if form.is_valid():
+            inscripcion = form.save(commit=False)
+            inscripcion.actividad = actividad
+            inscripcion.save()
+            return redirect("participantes_actividad", pk=actividad.pk)
+    else:
+        form = InscripcionForm()
+
+    return render(request, "core/form_inscripcion.html", {
+        "form": form,
         "actividad": actividad
     })

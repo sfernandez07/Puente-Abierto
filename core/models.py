@@ -115,19 +115,17 @@ class Inscripcion(models.Model):
         return f"{self.participante} → {self.actividad}"
 
     def clean(self):
-        """
-        Reglas críticas de negocio:
+    # Asegurarnos de que existe actividad antes de validar
+        if not self.actividad_id:
+            return
 
-        HU-06 – Evitar sobrecupos.
-        No permitir más inscripciones que plazas disponibles.
-        """
-
-        # Si estamos creando una nueva inscripción
+        # Solo validar si es nueva inscripción
         if not self.pk:
             if self.actividad.plazas_disponibles <= 0:
                 raise ValidationError(
                     "No hay plazas disponibles para esta actividad."
                 )
+
 
     def save(self, *args, **kwargs):
         """

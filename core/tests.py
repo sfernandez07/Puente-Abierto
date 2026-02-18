@@ -1,6 +1,8 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
+from django.urls import reverse
+from django.contrib.auth.models import User
 from decimal import Decimal
 from datetime import date, timedelta
 
@@ -144,7 +146,6 @@ class InscripcionModelTest(TestCase):
             )
 
     def test_no_permitir_inscripcion_duplicada(self):
-    # Creamos actividad con más de una plaza
         actividad = Actividad.objects.create(
             nombre="Pilates",
             descripcion="Clase duplicada",
@@ -165,7 +166,6 @@ class InscripcionModelTest(TestCase):
                 participante=self.participante1,
             )
 
-
     def test_registro_pago_correcto(self):
         inscripcion = Inscripcion.objects.create(
             actividad=self.actividad,
@@ -174,3 +174,155 @@ class InscripcionModelTest(TestCase):
         )
 
         self.assertTrue(inscripcion.pagado)
+
+
+# =====================================================
+# TESTS DE VISTAS (FUNCIONALES)
+# =====================================================
+
+class VistasTest(TestCase):
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="admin",
+            password="1234"
+        )
+
+        self.actividad = Actividad.objects.create(
+            nombre="Curso Django",
+            descripcion="Curso completo",
+            fecha_inicio=date.today(),
+            fecha_fin=date.today() + timedelta(days=5),
+            precio=Decimal("100.00"),
+            plazas_maximas=5,
+        )
+
+        self.participante = Participante.objects.create(
+            nombre="Elena",
+            apellidos="Martínez",
+            email="elena@example.com",
+            telefono="123456789"
+        )
+
+    # -------------------------
+    # Autenticación requerida
+    # -------------------------
+
+    def test_lista_actividades_requiere_login(self):
+        response = self.client.get(reverse("lista_actividades"))
+        self.assertEqual(response.status_code, 302)
+
+    # -------------------------
+    # Flujo autenticado
+    # -------------------------
+
+    def test_crear_actividad(self):
+        self.client.login(username="admin", password="1234")
+
+        response = self.client.post(reverse("crear_actividad"), {
+            "nombre": "Nueva Actividad",
+            "descripcion": "Descripción",
+            "fecha_inicio": date.today(),
+            "fecha_fin": date.today() + timedelta(days=2),
+            "precio": "40.00",
+            "plazas_maximas": 10,
+        })
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Actividad.objects.count(), 2)
+
+    def test_crear_participante(self):
+        self.client.login(username="admin", password="1234")
+
+        response = self.client.post(reverse("crear_participante"), {
+            "nombre": "Carlos",
+            "apellidos": "López",
+            "email": "carlos@test.com",
+            "telefono": "999999999"
+        })
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(Participante.objects.count(), 2)
+
+    def test_crear_inscripcion_actividad(self):
+        self.client.login(username="admin", password="1234")
+
+        response = self.client.post(
+            reverse("crear_inscripcion_actividad", args=[self.actividad.pk]),
+            {"participante": self.participante.pk}
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(self.actividad.inscripciones.count(), 1)
+
+    def test_marcar_pago(self):
+        self.client.login(username="admin", password="1234")
+
+        inscripcion = Inscripcion.objects.create(
+            actividad=self.actividad,
+            participante=self.participante,
+        )
+
+        self.client.get(reverse("marcar_pago", args=[inscripcion.pk]))
+
+        inscripcion.refresh_from_db()
+        self.assertTrue(inscripcion.pagado)
+
+    def test_eliminar_actividad(self):
+        self.client.login(username="admin", password="1234")
+
+        response = self.client.post(
+            reverse("eliminar_actividad", args=[self.actividad.pk])
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertFalse(
+            Actividad.objects.filter(pk=self.actividad.pk).exists()
+        )
+
+    def test_exportar_csv(self):
+        self.client.login(username="admin", password="1234")
+
+        Inscripcion.objects.create(
+            actividad=self.actividad,
+            participante=self.participante,
+            pagado=True
+        )
+
+        response = self.client.get(
+            reverse("exportar_participantes", args=[self.actividad.pk])
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "text/csv")
+        self.assertIn("attachment;", response["Content-Disposition"])
+
+    def test_resumen_general(self):
+        self.client.login(username="admin", password="1234")
+
+        Inscripcion.objects.create(
+            actividad=self.actividad,
+            participante=self.participante,
+            pagado=True
+        )
+
+        response = self.client.get(reverse("resumen_general"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "100.00")
+
+    def test_historial_participante(self):
+        self.client.login(username="admin", password="1234")
+
+        Inscripcion.objects.create(
+            actividad=self.actividad,
+            participante=self.participante,
+            pagado=True
+        )
+
+        response = self.client.get(
+            reverse("historial_participante", args=[self.participante.pk])
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Curso Django")

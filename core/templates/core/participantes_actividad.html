@@ -3,6 +3,16 @@
 {% block content %}
 
 <h2>Participantes - {{ actividad.nombre }}</h2>
+<a href="{% url 'crear_inscripcion_actividad' actividad.pk %}" 
+   class="btn btn-success">
+    + Añadir participante
+</a>
+<br><br>
+<a href="{% url 'exportar_participantes' actividad.pk %}" 
+   class="btn btn-success">
+    Exportar CSV
+</a>
+<br><br>
 
 <p>
     <strong>Plazas disponibles:</strong> {{ actividad.plazas_disponibles }} <br>

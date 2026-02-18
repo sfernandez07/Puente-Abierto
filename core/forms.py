@@ -22,17 +22,10 @@ class ActividadForm(forms.ModelForm):
 
 class InscripcionForm(forms.ModelForm):
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # ✅ Mostrar solo actividades que no hayan finalizado
-        self.fields["actividad"].queryset = Actividad.objects.filter(
-            fecha_fin__gte=timezone.now().date()
-        )
-
     class Meta:
         model = Inscripcion
-        fields = ["actividad", "participante"]
+        fields = ["participante"]
+
 
 
 class ParticipanteForm(forms.ModelForm):

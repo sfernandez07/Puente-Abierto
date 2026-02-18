@@ -1,0 +1,206 @@
+/* ============================
+   ESTILO GENERAL
+============================ */
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: #f5f7fa;
+    margin: 0;
+    padding: 0;
+    color: #2f3e46;
+}
+
+.container {
+    width: 90%;
+    max-width: 1100px;
+    margin: 30px auto;
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+}
+
+/* ============================
+   HEADER
+============================ */
+
+header {
+    background-color: #4a90e2;
+    color: white;
+    padding: 20px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 22px;
+}
+
+nav {
+    margin-top: 10px;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    margin-right: 15px;
+    font-weight: 500;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+/* ============================
+   HEADER LAYOUT
+============================ */
+
+.header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.nav-left {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.nav-right form {
+    margin: 0;
+}
+
+.welcome {
+    font-weight: 500;
+}
+
+
+/* ============================
+   FOOTER
+============================ */
+
+footer {
+    text-align: center;
+    padding: 15px;
+    font-size: 13px;
+    color: #7a8a97;
+}
+
+/* ============================
+   TABLAS
+============================ */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+table thead {
+    background-color: #eef3f8;
+}
+
+table th,
+table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #dce3ea;
+}
+
+table th {
+    font-weight: 600;
+}
+
+table tr:hover {
+    background-color: #f2f6fa;
+}
+
+/* ============================
+   BOTONES
+============================ */
+
+.btn {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    background-color: #4a90e2;
+    color: white;
+    transition: background-color 0.2s ease;
+}
+
+.btn:hover {
+    background-color: #3a78c2;
+}
+
+.btn-success {
+    background-color: #6bbf8a;
+}
+
+.btn-success:hover {
+    background-color: #58a876;
+}
+
+.btn-danger {
+    background-color: #e57373;
+}
+
+.btn-danger:hover {
+    background-color: #d85c5c;
+}
+
+/* ============================
+   FORMULARIOS
+============================ */
+
+form table {
+    width: 100%;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #dce3ea;
+    font-size: 14px;
+    margin-top: 4px;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.15);
+}
+
+/* ============================
+   ALERTAS
+============================ */
+
+.alert {
+    background-color: #fdecea;
+    color: #a94442;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+}
+
+/* ============================
+   ESTADOS
+============================ */
+
+strong {
+    font-weight: 600;
+}

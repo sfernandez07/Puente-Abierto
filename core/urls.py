@@ -12,4 +12,6 @@ urlpatterns = [
     path("inscripcion/<int:pk>/pago/", views.marcar_pago, name="marcar_pago"),
     path("participante/nuevo/", views.crear_participante, name="crear_participante"),
     path("actividad/<int:pk>/eliminar/", views.eliminar_actividad, name="eliminar_actividad"),
+    path("actividad/<int:pk>/exportar/", views.exportar_participantes, name="exportar_participantes"),
+    path("actividad/<int:pk>/inscribir/", views.crear_inscripcion_actividad, name="crear_inscripcion_actividad"),
 ]
