@@ -58,3 +58,6 @@ Desktop.ini
 # Archivos temporales
 *.swp
 *.bak
+
+# Axet PlugIn
+memory-bank/
