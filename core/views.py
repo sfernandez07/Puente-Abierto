@@ -5,6 +5,7 @@ from .forms import ActividadForm, InscripcionForm, ParticipanteForm
 from django.db.models import Sum
 import csv
 from django.http import HttpResponse
+import unicodedata
 
 
 @login_required
@@ -116,39 +117,52 @@ def eliminar_actividad(request, pk):
         "actividad": actividad
     })
 
+def quitar_acentos(texto):
+    """
+    Convierte texto Unicode con acentos a ASCII simple.
+    Ejemplo: Fernández -> Fernandez
+    """
+    if not texto:
+        return ""
+
+    texto_normalizado = unicodedata.normalize("NFKD", str(texto))
+    texto_sin_acentos = texto_normalizado.encode("ascii", "ignore").decode("utf-8")
+    return texto_sin_acentos
+
 @login_required
 def exportar_participantes(request, pk):
     actividad = get_object_or_404(Actividad, pk=pk)
     inscripciones = actividad.inscripciones.select_related("participante")
 
-    # Crear respuesta HTTP tipo archivo
     response = HttpResponse(content_type="text/csv")
-    response["Content-Disposition"] = f'attachment; filename="participantes_{actividad.pk}.csv"'
+    response["Content-Disposition"] = (
+        f'attachment; filename="participantes_{actividad.pk}.csv"'
+    )
 
     writer = csv.writer(response)
 
-    # Cabecera
+    # Cabecera sin acentos
     writer.writerow([
         "Nombre",
         "Apellidos",
         "Email",
-        "Teléfono",
-        "Fecha inscripción",
+        "Telefono",
+        "Fecha inscripcion",
         "Pagado"
     ])
 
-    # Datos
     for inscripcion in inscripciones:
         writer.writerow([
-            inscripcion.participante.nombre,
-            inscripcion.participante.apellidos,
-            inscripcion.participante.email,
-            inscripcion.participante.telefono,
-            inscripcion.fecha_inscripcion,
-            "Sí" if inscripcion.pagado else "No"
+            quitar_acentos(inscripcion.participante.nombre),
+            quitar_acentos(inscripcion.participante.apellidos),
+            quitar_acentos(inscripcion.participante.email),
+            quitar_acentos(inscripcion.participante.telefono),
+            quitar_acentos(inscripcion.fecha_inscripcion),
+            "Si" if inscripcion.pagado else "No"
         ])
 
     return response
+
 
 @login_required
 def crear_inscripcion_actividad(request, pk):
