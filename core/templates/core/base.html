@@ -99,11 +99,23 @@
 <header>
     <h1>Asociación Cultural Puente Abierto</h1>
     <nav>
+    {% if user.is_authenticated %}
         <a href="{% url 'lista_actividades' %}">Actividades</a>
         <a href="{% url 'crear_actividad' %}">Nueva Actividad</a>
         <a href="{% url 'crear_inscripcion' %}">Nueva Inscripción</a>
+        <a href="{% url 'crear_participante' %}">Nuevo Participante</a>
         <a href="{% url 'resumen_general' %}">Resumen General</a>
-    </nav>
+        <span>Bienvenido, {{ user.username }}</span>
+
+        <form action="{% url 'logout' %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">
+                Cerrar sesión
+            </button>
+        </form>
+    {% endif %}
+</nav>
+
 </header>
 
 <div class="container">

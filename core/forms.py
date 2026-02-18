@@ -1,5 +1,5 @@
 from django import forms
-from .models import Actividad, Inscripcion
+from .models import Actividad, Inscripcion, Participante
 from django.utils import timezone
 
 
@@ -34,4 +34,8 @@ class InscripcionForm(forms.ModelForm):
         model = Inscripcion
         fields = ["actividad", "participante"]
 
-    
+
+class ParticipanteForm(forms.ModelForm):
+    class Meta:
+        model = Participante
+        fields = ["nombre", "apellidos", "email", "telefono"]

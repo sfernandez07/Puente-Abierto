@@ -1,0 +1,26 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+
+<h2>Iniciar sesión</h2>
+
+<form method="post">
+    {% csrf_token %}
+
+    {% if form.errors %}
+        <div class="alert">
+            Usuario o contraseña incorrectos.
+        </div>
+    {% endif %}
+
+    <table>
+        {{ form.as_table }}
+    </table>
+
+    <br>
+    <button type="submit" class="btn btn-success">
+        Entrar
+    </button>
+</form>
+
+{% endblock %}

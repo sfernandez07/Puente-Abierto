@@ -10,4 +10,6 @@ urlpatterns = [
     path("participante/<int:pk>/historial/", views.historial_participante, name="historial_participante"),
     path("resumen/", views.resumen_general, name="resumen_general"),
     path("inscripcion/<int:pk>/pago/", views.marcar_pago, name="marcar_pago"),
+    path("participante/nuevo/", views.crear_participante, name="crear_participante"),
+    path("actividad/<int:pk>/eliminar/", views.eliminar_actividad, name="eliminar_actividad"),
 ]

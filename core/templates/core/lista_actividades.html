@@ -48,6 +48,9 @@
                 <a href="{% url 'participantes_actividad' actividad.pk %}" class="btn">
                     Participantes
                 </a>
+                <a href="{% url 'eliminar_actividad' actividad.pk %}" class="btn btn-danger">
+                    Eliminar
+                </a>
             </td>
         </tr>
         {% empty %}

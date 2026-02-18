@@ -1,0 +1,26 @@
+{% extends "core/base.html" %}
+
+{% block content %}
+
+<h2>Confirmar eliminación</h2>
+
+<div class="alert">
+    ¿Estás seguro de que deseas eliminar la actividad 
+    <strong>{{ actividad.nombre }}</strong>?
+    <br><br>
+    Esta acción eliminará también todas sus inscripciones.
+</div>
+
+<form method="post">
+    {% csrf_token %}
+
+    <button type="submit" class="btn btn-danger">
+        Sí, eliminar
+    </button>
+
+    <a href="{% url 'lista_actividades' %}" class="btn">
+        Cancelar
+    </a>
+</form>
+
+{% endblock %}
