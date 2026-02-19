@@ -326,3 +326,233 @@ class VistasTest(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Curso Django")
+
+# =====================================================
+# TESTS ADICIONALES MODELO ACTIVIDAD
+# =====================================================
+
+class ActividadModelExtraTest(TestCase):
+
+    def setUp(self):
+        self.actividad = Actividad.objects.create(
+            nombre="Escultura",
+            descripcion="Curso artístico",
+            fecha_inicio=date.today(),
+            fecha_fin=date.today() + timedelta(days=3),
+            precio=Decimal("75.00"),
+            plazas_maximas=5,
+        )
+
+    def test_ingresos_totales_sin_inscripciones(self):
+        self.assertEqual(self.actividad.ingresos_totales, 0)
+
+    def test_plazas_disponibles_no_negativas(self):
+        self.actividad.plazas_maximas = 0
+        self.actividad.save()
+        self.assertEqual(self.actividad.plazas_disponibles, 0)
+
+
+# =====================================================
+# TESTS ADICIONALES MODELO INSCRIPCION
+# =====================================================
+
+class InscripcionModelExtraTest(TestCase):
+
+    def setUp(self):
+        self.actividad = Actividad.objects.create(
+            nombre="Teatro",
+            descripcion="Curso intensivo",
+            fecha_inicio=date.today(),
+            fecha_fin=date.today() + timedelta(days=5),
+            precio=Decimal("40.00"),
+            plazas_maximas=1,
+        )
+
+        self.participante = Participante.objects.create(
+            nombre="Luis",
+            apellidos="Gómez",
+            email="luis@example.com",
+        )
+
+    def test_actualizar_inscripcion_no_dispara_sobrecupo(self):
+        inscripcion = Inscripcion.objects.create(
+            actividad=self.actividad,
+            participante=self.participante,
+        )
+
+        self.actividad.plazas_maximas = 1
+        self.actividad.save()
+
+        inscripcion.pagado = True
+        inscripcion.save()
+
+        self.assertTrue(inscripcion.pagado)
+
+    def test_constraint_unica_inscripcion_validation_error(self):
+        Inscripcion.objects.create(
+            actividad=self.actividad,
+            participante=self.participante,
+        )
+
+        with self.assertRaises(ValidationError):
+            Inscripcion.objects.create(
+                actividad=self.actividad,
+                participante=self.participante,
+            )
+
+
+
+# =====================================================
+# TESTS ADICIONALES VISTAS - SEGURIDAD
+# =====================================================
+
+class SeguridadVistasTest(TestCase):
+
+    def setUp(self):
+        self.actividad = Actividad.objects.create(
+            nombre="Música",
+            descripcion="Curso musical",
+            fecha_inicio=date.today(),
+            fecha_fin=date.today() + timedelta(days=5),
+            precio=Decimal("60.00"),
+            plazas_maximas=5,
+        )
+
+        self.participante = Participante.objects.create(
+            nombre="Ana",
+            apellidos="Ruiz",
+            email="ana@test.com",
+        )
+
+        self.inscripcion = Inscripcion.objects.create(
+            actividad=self.actividad,
+            participante=self.participante,
+        )
+
+    def test_exportar_requiere_login(self):
+        response = self.client.get(
+            reverse("exportar_participantes", args=[self.actividad.pk])
+        )
+        self.assertEqual(response.status_code, 302)
+
+    def test_crear_inscripcion_requiere_login(self):
+        response = self.client.post(
+            reverse("crear_inscripcion_actividad", args=[self.actividad.pk]),
+            {"participante": self.participante.pk}
+        )
+        self.assertEqual(response.status_code, 302)
+
+    def test_marcar_pago_requiere_login(self):
+        response = self.client.get(
+            reverse("marcar_pago", args=[self.inscripcion.pk])
+        )
+        self.assertEqual(response.status_code, 302)
+
+    def test_resumen_general_requiere_login(self):
+        response = self.client.get(reverse("resumen_general"))
+        self.assertEqual(response.status_code, 302)
+
+
+
+# =====================================================
+# TESTS BUSQUEDA PARTICIPANTES
+# =====================================================
+
+class BusquedaParticipantesTest(TestCase):
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="admin",
+            password="1234"
+        )
+
+        self.actividad = Actividad.objects.create(
+            nombre="Fotografía",
+            descripcion="Curso básico",
+            fecha_inicio=date.today(),
+            fecha_fin=date.today() + timedelta(days=5),
+            precio=Decimal("90.00"),
+            plazas_maximas=5,
+        )
+
+        self.p1 = Participante.objects.create(
+            nombre="Pedro",
+            apellidos="Sánchez",
+            email="pedro@example.com",
+        )
+
+        self.p2 = Participante.objects.create(
+            nombre="María",
+            apellidos="López",
+            email="maria@example.com",
+        )
+
+    def test_busqueda_por_nombre(self):
+        self.client.login(username="admin", password="1234")
+
+        response = self.client.get(
+            reverse("crear_inscripcion_actividad", args=[self.actividad.pk]),
+            {"q": "Pedro"}
+        )
+
+        self.assertContains(response, "Pedro")
+        self.assertNotContains(response, "María")
+
+    def test_no_mostrar_participante_ya_inscrito(self):
+        self.client.login(username="admin", password="1234")
+
+        Inscripcion.objects.create(
+            actividad=self.actividad,
+            participante=self.p1,
+        )
+
+        response = self.client.get(
+            reverse("crear_inscripcion_actividad", args=[self.actividad.pk])
+        )
+
+        self.assertNotContains(response, self.p1.email)
+
+
+# =====================================================
+# TEST CONTENIDO CSV
+# =====================================================
+
+class CSVContenidoTest(TestCase):
+
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="admin",
+            password="1234"
+        )
+
+        self.actividad = Actividad.objects.create(
+            nombre="Literatura",
+            descripcion="Club de lectura",
+            fecha_inicio=date.today(),
+            fecha_fin=date.today() + timedelta(days=2),
+            precio=Decimal("35.00"),
+            plazas_maximas=5,
+        )
+
+        self.participante = Participante.objects.create(
+            nombre="José",
+            apellidos="Fernández",
+            email="jose@example.com",
+        )
+
+    def test_csv_contiene_datos_correctos(self):
+        self.client.login(username="admin", password="1234")
+
+        Inscripcion.objects.create(
+            actividad=self.actividad,
+            participante=self.participante,
+            pagado=True
+        )
+
+        response = self.client.get(
+            reverse("exportar_participantes", args=[self.actividad.pk])
+        )
+
+        self.assertContains(response, "Jose")  # sin acento
+        self.assertContains(response, "Fernandez")
+        self.assertContains(response, "Si")

@@ -6,6 +6,7 @@ from django.db.models import Sum
 import csv
 from django.http import HttpResponse
 import unicodedata
+from django.db.models import Q
 
 
 @login_required
@@ -168,6 +169,22 @@ def exportar_participantes(request, pk):
 def crear_inscripcion_actividad(request, pk):
     actividad = get_object_or_404(Actividad, pk=pk)
 
+    # Obtener texto de búsqueda
+    query = request.GET.get("q", "").strip()
+
+    # Base queryset: participantes no inscritos aún en esta actividad
+    participantes = Participante.objects.exclude(
+        inscripciones__actividad=actividad
+    )
+
+    # Aplicar filtro si hay búsqueda
+    if query:
+        participantes = participantes.filter(
+            Q(nombre__icontains=query) |
+            Q(apellidos__icontains=query) |
+            Q(email__icontains=query)
+        )
+
     if request.method == "POST":
         form = InscripcionForm(request.POST)
         if form.is_valid():
@@ -178,7 +195,11 @@ def crear_inscripcion_actividad(request, pk):
     else:
         form = InscripcionForm()
 
+    # Sobrescribir queryset del campo participante
+    form.fields["participante"].queryset = participantes
+
     return render(request, "core/form_inscripcion.html", {
         "form": form,
-        "actividad": actividad
+        "actividad": actividad,
+        "query": query,
     })

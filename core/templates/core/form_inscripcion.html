@@ -10,6 +10,16 @@
         <strong>Fechas:</strong> {{ actividad.fecha_inicio }} - {{ actividad.fecha_fin }} <br>
         <strong>Plazas disponibles:</strong> {{ actividad.plazas_disponibles }}
     </div>
+    <form method="get" class="search-box">
+    <input type="text" 
+           name="q" 
+           placeholder="Buscar participante por nombre, apellidos o email..."
+           value="{{ query|default:'' }}">
+    <button type="submit" class="btn">
+        Buscar
+    </button>
+</form>
+
 {% endif %}
 
 <form method="post">

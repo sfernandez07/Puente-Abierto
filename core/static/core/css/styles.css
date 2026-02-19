@@ -204,3 +204,30 @@ textarea:focus {
 strong {
     font-weight: 600;
 }
+
+/* ============================
+   BLOQUES AUXILIARES
+============================ */
+
+/* ============================
+   BLOQUES AUXILIARES
+============================ */
+
+.search-box {
+    margin-top: 20px;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 15px;              /* ✅ separación automática */
+}
+
+.search-box input {
+    flex: 0 0 300px;        /* ✅ fuerza ancho fijo */
+    width: auto;            /* ✅ anula width:100% global */
+    margin-top: 0;
+}
+
+.search-box button {
+    margin-top: 0;
+}
+
